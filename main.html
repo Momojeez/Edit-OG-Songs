@@ -1,0 +1,655 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>MaxDoesEdit - Virtual Coin Fundraiser</title>
+    <meta name="description" content="Support MaxDoesEdit's virtual coin fundraiser! Donate virtual coins, leave messages, and help reach the goal. Features the exciting Wheel of Doom at 50k+ donations!" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+        }
+        
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+        
+        .progress-bar {
+            background: #1e293b;
+            border-radius: 8px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #06b6d4;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+        
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            background: #1e293b;
+            color: #f1f5f9;
+            font-size: 1rem;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .button-secondary {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+        }
+        
+        .daily-reward {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .wheel {
+            width: 200px;
+            height: 200px;
+            border: 4px solid #3b82f6;
+            border-radius: 50%;
+            position: relative;
+            background: conic-gradient(
+                from 0deg,
+                #ef4444 0deg 60deg,
+                #f59e0b 60deg 120deg,
+                #10b981 120deg 180deg,
+                #3b82f6 180deg 240deg,
+                #8b5cf6 240deg 300deg,
+                #ec4899 300deg 360deg
+            );
+            cursor: pointer;
+            transition: transform 2s ease-out;
+        }
+        
+        .wheel::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid #f1f5f9;
+        }
+        
+        .donations-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .donation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .donation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .donation-amount {
+            font-weight: bold;
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        // Mock API functions
+        const api = {
+            async getFundraiser() {
+                const stored = localStorage.getItem('fundraiser');
+                return stored ? JSON.parse(stored) : {
+                    currentAmount: 0,
+                    currentGoal: 1000000,
+                    totalDonations: 0
+                };
+            },
+
+            async getDonations() {
+                const stored = localStorage.getItem('donations');
+                return stored ? JSON.parse(stored) : [];
+            },
+
+            async createUser() {
+                let user = JSON.parse(localStorage.getItem('user') || 'null');
+                if (!user) {
+                    user = {
+                        id: Math.random().toString(36).substring(7),
+                        username: `User${Math.floor(Math.random() * 10000)}`,
+                        coins: 1000
+                    };
+                    localStorage.setItem('user', JSON.stringify(user));
+                }
+                return user;
+            },
+
+            async claimDailyReward(userId) {
+                const lastClaim = localStorage.getItem('lastDailyReward');
+                const today = new Date().toDateString();
+                
+                if (lastClaim !== today) {
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    user.coins += 100;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('lastDailyReward', today);
+                    return { claimed: true, reward: 100 };
+                }
+                return { claimed: false };
+            },
+
+            async createDonation(donationData) {
+                const donations = JSON.parse(localStorage.getItem('donations') || '[]');
+                const fundraiser = JSON.parse(localStorage.getItem('fundraiser') || '{"currentAmount":0,"totalDonations":0,"currentGoal":1000000}');
+                const user = JSON.parse(localStorage.getItem('user'));
+
+                if (user.coins >= donationData.amount) {
+                    const newDonation = {
+                        id: Math.random().toString(36).substring(7),
+                        ...donationData,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    user.coins -= donationData.amount;
+                    fundraiser.currentAmount += donationData.amount;
+                    fundraiser.totalDonations += 1;
+
+                    donations.unshift(newDonation);
+                    
+                    localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('donations', JSON.stringify(donations.slice(0, 50)));
+                    localStorage.setItem('fundraiser', JSON.stringify(fundraiser));
+
+                    return newDonation;
+                }
+                throw new Error('Insufficient coins');
+            }
+        };
+
+        function FundraiserCard() {
+            const [fundraiser, setFundraiser] = useState(null);
+
+            useEffect(() => {
+                const fetchData = async () => {
+                    const data = await api.getFundraiser();
+                    setFundraiser(data);
+                };
+                fetchData();
+                const interval = setInterval(fetchData, 3000);
+                return () => clearInterval(interval);
+            }, []);
+
+            if (!fundraiser) return <div>Loading...</div>;
+
+            const progress = (fundraiser.currentAmount / fundraiser.currentGoal) * 100;
+            const isWheelAvailable = fundraiser.currentAmount >= 50000;
+
+            return (
+                <div className="card">
+                    <div className="progress-container">
+                        <div className="progress-bar">
+                            <div 
+                                className="progress-fill" 
+                                style={{ width: `${Math.min(progress, 100)}%` }}
+                            />
+                        </div>
+                        <div className="stats">
+                            <div className="stat">
+                                <div className="stat-value">{fundraiser.currentAmount.toLocaleString()}</div>
+                                <div className="stat-label">Raised</div>
+                            </div>
+                            <div className="stat">
+                                <div className="stat-value">{fundraiser.currentGoal.toLocaleString()}</div>
+                                <div className="stat-label">Goal</div>
+                            </div>
+                            <div className="stat">
+                                <div className="stat-value">{fundraiser.totalDonations}</div>
+                                <div className="stat-label">Donations</div>
+                            </div>
+                        </div>
+                    </div>
+                    {isWheelAvailable && (
+                        <div style={{ textAlign: 'center', padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', border: '1px solid #ef4444' }}>
+                            🎊 Wheel of Doom is now available! 🎊
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function DonationForm({ onDonationSuccess }) {
+            const [amount, setAmount] = useState('');
+            const [message, setMessage] = useState('');
+            const [isAnonymous, setIsAnonymous] = useState(false);
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [user, setUser] = useState(null);
+
+            useEffect(() => {
+                const initUser = async () => {
+                    const userData = await api.createUser();
+                    setUser(userData);
+                };
+                initUser();
+            }, []);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!amount || isSubmitting) return;
+
+                setIsSubmitting(true);
+                try {
+                    await api.createDonation({
+                        amount: parseInt(amount),
+                        message: message.trim(),
+                        donorName: isAnonymous ? 'Anonymous' : user?.username || 'Anonymous'
+                    });
+                    
+                    setAmount('');
+                    setMessage('');
+                    onDonationSuccess();
+                    
+                    // Update user data
+                    const updatedUser = await api.createUser();
+                    setUser(updatedUser);
+                } catch (error) {
+                    alert(error.message);
+                } finally {
+                    setIsSubmitting(false);
+                }
+            };
+
+            return (
+                <div className="card">
+                    <h2 style={{ marginBottom: '1.5rem', color: '#06b6d4' }}>Make a Donation</h2>
+                    {user && (
+                        <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '6px', border: '1px solid #3b82f6' }}>
+                            <strong>{user.username}</strong> - {user.coins} coins available
+                        </div>
+                    )}
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label className="label">Amount (coins)</label>
+                            <input
+                                type="number"
+                                className="input"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                min="1"
+                                max={user?.coins || 1000}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="label">Message (optional)</label>
+                            <textarea
+                                className="input textarea"
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="Leave a message..."
+                                maxLength="200"
+                            />
+                        </div>
+                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <input
+                                type="checkbox"
+                                id="anonymous"
+                                checked={isAnonymous}
+                                onChange={(e) => setIsAnonymous(e.target.checked)}
+                            />
+                            <label htmlFor="anonymous" className="label" style={{ margin: 0 }}>Donate anonymously</label>
+                        </div>
+                        <button
+                            type="submit"
+                            className="button"
+                            disabled={isSubmitting || !amount}
+                        >
+                            {isSubmitting ? 'Donating...' : 'Donate'}
+                        </button>
+                    </form>
+                </div>
+            );
+        }
+
+        function DailyReward() {
+            const [user, setUser] = useState(null);
+            const [canClaim, setCanClaim] = useState(false);
+            const [claiming, setClaiming] = useState(false);
+
+            useEffect(() => {
+                const initUser = async () => {
+                    const userData = await api.createUser();
+                    setUser(userData);
+                    
+                    const lastClaim = localStorage.getItem('lastDailyReward');
+                    const today = new Date().toDateString();
+                    setCanClaim(lastClaim !== today);
+                };
+                initUser();
+            }, []);
+
+            const handleClaim = async () => {
+                if (!canClaim || claiming) return;
+                
+                setClaiming(true);
+                try {
+                    const result = await api.claimDailyReward(user.id);
+                    if (result.claimed) {
+                        const updatedUser = await api.createUser();
+                        setUser(updatedUser);
+                        setCanClaim(false);
+                        alert(`Claimed ${result.reward} coins!`);
+                    }
+                } catch (error) {
+                    alert('Failed to claim reward');
+                } finally {
+                    setClaiming(false);
+                }
+            };
+
+            if (!user) return null;
+
+            return (
+                <div className="daily-reward">
+                    <h3 style={{ marginBottom: '0.5rem' }}>Daily Reward</h3>
+                    <p style={{ marginBottom: '1rem', color: '#94a3b8' }}>
+                        {canClaim ? 'Claim your daily 100 coins!' : 'Come back tomorrow for more coins!'}
+                    </p>
+                    <button
+                        className={`button ${canClaim ? '' : 'button-secondary'}`}
+                        onClick={handleClaim}
+                        disabled={!canClaim || claiming}
+                    >
+                        {claiming ? 'Claiming...' : canClaim ? 'Claim Reward' : 'Already Claimed'}
+                    </button>
+                </div>
+            );
+        }
+
+        function WheelOfDoom() {
+            const [isSpinning, setIsSpinning] = useState(false);
+            const [rotation, setRotation] = useState(0);
+
+            const spinWheel = () => {
+                if (isSpinning) return;
+                
+                setIsSpinning(true);
+                const spins = 5 + Math.random() * 5; // 5-10 spins
+                const finalRotation = rotation + (spins * 360);
+                setRotation(finalRotation);
+                
+                setTimeout(() => {
+                    setIsSpinning(false);
+                    const rewards = ['1000 coins', '500 coins', '2000 coins', '100 coins', '5000 coins', '250 coins'];
+                    const rewardIndex = Math.floor(Math.random() * rewards.length);
+                    alert(`You won: ${rewards[rewardIndex]}!`);
+                }, 2000);
+            };
+
+            return (
+                <div className="card">
+                    <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#ef4444' }}>
+                        🎡 Wheel of Doom 🎡
+                    </h2>
+                    <div className="wheel-container">
+                        <div 
+                            className="wheel"
+                            style={{ transform: `rotate(${rotation}deg)` }}
+                            onClick={spinWheel}
+                        />
+                        <button 
+                            className="button" 
+                            onClick={spinWheel}
+                            disabled={isSpinning}
+                        >
+                            {isSpinning ? 'Spinning...' : 'Spin the Wheel!'}
+                        </button>
+                        <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center' }}>
+                            Available at 50,000+ donations!
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        function RecentDonations() {
+            const [donations, setDonations] = useState([]);
+
+            useEffect(() => {
+                const fetchDonations = async () => {
+                    const data = await api.getDonations();
+                    setDonations(data);
+                };
+                fetchDonations();
+                const interval = setInterval(fetchDonations, 3000);
+                return () => clearInterval(interval);
+            }, []);
+
+            return (
+                <div className="card">
+                    <h2 style={{ marginBottom: '1.5rem', color: '#06b6d4' }}>Recent Donations</h2>
+                    <div className="donations-list">
+                        {donations.length === 0 ? (
+                            <p style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem' }}>
+                                No donations yet. Be the first to contribute!
+                            </p>
+                        ) : (
+                            donations.map((donation) => (
+                                <div key={donation.id} className="donation-item">
+                                    <div>
+                                        <div style={{ fontWeight: '500' }}>{donation.donorName}</div>
+                                        {donation.message && (
+                                            <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+                                                "{donation.message}"
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="donation-amount">
+                                        {donation.amount.toLocaleString()} coins
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [refreshKey, setRefreshKey] = useState(0);
+
+            const handleDonationSuccess = useCallback(() => {
+                setRefreshKey(prev => prev + 1);
+            }, []);
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1 className="title">MaxDoesEdit Virtual Coin Fundraiser</h1>
+                        <p className="subtitle">
+                            Support the cause by donating virtual coins and help unlock amazing rewards!
+                        </p>
+                    </div>
+
+                    <FundraiserCard key={refreshKey} />
+                    
+                    <div className="grid">
+                        <div>
+                            <DailyReward />
+                            <DonationForm onDonationSuccess={handleDonationSuccess} />
+                        </div>
+                        <div>
+                            <WheelOfDoom />
+                            <RecentDonations key={refreshKey} />
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
