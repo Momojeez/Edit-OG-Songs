@@ -5,55 +5,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MaxDoesEdit - Virtual Coin Fundraiser</title>
+    <meta name="description" content="Support MaxDoesEdit's virtual coin fundraiser! Donate virtual coins, leave messages, and help reach the goal. Features the exciting Wheel of Doom at 50k+ donations!">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
     <style>
         :root {
-            --background: 220 15% 8%;
-            --foreground: 220 5% 95%;
-            --border: 220 12% 18%;
-            --card: 220 15% 11%;
-            --card-foreground: 220 5% 95%;
-            --card-border: 220 12% 21%;
-            --primary: 220 90% 35%;
-            --primary-foreground: 220 5% 95%;
-            --secondary: 220 12% 20%;
-            --secondary-foreground: 220 5% 95%;
-            --muted: 220 12% 16%;
-            --muted-foreground: 220 15% 65%;
-            --accent: 190 75% 55%;
-            --accent-foreground: 220 15% 8%;
-            --destructive: 0 90% 25%;
-            --destructive-foreground: 0 5% 95%;
-            --input: 220 20% 25%;
-            --ring: 220 90% 25%;
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --card-border: 217.2 32.6% 17.5%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --popover-border: 217.2 32.6% 17.5%;
+            --primary: 217.2 91.2% 59.8%;
+            --primary-foreground: 222.2 84% 4.9%;
+            --primary-border: 217.2 91.2% 59.8%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --secondary-border: 217.2 32.6% 17.5%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 224.3 76.3% 48%;
             --radius: 0.5rem;
         }
 
         * {
-            margin: 0;
-            padding: 0;
+            border-color: hsl(var(--border));
+        }
+
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             background-color: hsl(var(--background));
             color: hsl(var(--foreground));
             line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 72rem;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
         }
 
+        /* Header Styles */
         .header {
-            background: hsl(var(--card));
-            border-bottom: 1px solid hsl(var(--border));
+            background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%);
+            border-bottom: 1px solid hsl(var(--card-border));
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
             padding: 1rem 0;
         }
 
@@ -64,345 +93,329 @@
             gap: 1rem;
         }
 
-        .profile-section {
+        .header-left {
             display: flex;
             align-items: center;
             gap: 1rem;
+            flex: 1;
         }
 
-        .profile-avatar {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1.25rem;
-            color: white;
+        .menu-button {
+            background: none;
+            border: none;
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
         }
 
-        .profile-info h1 {
+        .menu-button:hover {
+            background-color: hsl(var(--accent));
+        }
+
+        .header-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: hsl(var(--foreground));
+            background: linear-gradient(135deg, #60a5fa 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .profile-info p {
-            color: hsl(var(--muted-foreground));
-            font-size: 0.875rem;
-        }
-
-        .balance-display {
+        .coin-balance {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: hsl(var(--secondary));
+            background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
             padding: 0.5rem 1rem;
-            border-radius: var(--radius);
-            border: 1px solid hsl(var(--border));
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--card-border));
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.2);
         }
 
         .coin-icon {
             width: 1.25rem;
             height: 1.25rem;
-            color: hsl(var(--accent));
+            color: #fbbf24;
+            animation: shimmer 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes shimmer {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.1) rotate(5deg); }
         }
 
         .balance-amount {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 600;
-            color: hsl(var(--accent));
+            font-size: 0.875rem;
         }
 
-        .main {
-            padding: 2rem 0;
-        }
-
-        .layout {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
+        /* Card Styles */
         .card {
-            background: hsl(var(--card));
+            background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
             border: 1px solid hsl(var(--card-border));
-            border-radius: var(--radius);
+            border-radius: calc(var(--radius) + 4px);
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.1);
+            backdrop-filter: blur(10px);
             padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, hsl(var(--primary) / 0.05), hsl(var(--accent) / 0.05));
-            pointer-events: none;
-        }
-
-        .card-content {
-            position: relative;
-            z-index: 1;
+            margin-bottom: 1.5rem;
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: space-between;
             margin-bottom: 1rem;
         }
 
         .card-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: hsl(var(--foreground));
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
         }
 
         .card-description {
             color: hsl(var(--muted-foreground));
-            margin-bottom: 1.5rem;
-        }
-
-        .fundraiser-stats {
-            display: flex;
-            align-items: end;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .stat-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
-            font-weight: 700;
-            color: hsl(var(--foreground));
-        }
-
-        .stat-label {
-            color: hsl(var(--muted-foreground));
             font-size: 0.875rem;
+            margin: 0.5rem 0 0 0;
         }
 
+        /* Progress Bar */
         .progress-container {
-            margin-bottom: 1rem;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
+            margin: 1.5rem 0;
         }
 
         .progress-bar {
             width: 100%;
-            height: 0.75rem;
-            background: hsl(var(--secondary));
-            border-radius: var(--radius);
+            height: 1rem;
+            background-color: hsl(var(--secondary));
+            border-radius: 9999px;
             overflow: hidden;
+            position: relative;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%);
+            border-radius: 9999px;
+            transition: width 0.5s ease-in-out;
+            position: relative;
+            overflow: hidden;
         }
 
-        .badge {
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progressShimmer 2s infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .amount-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: hsl(var(--muted));
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, #60a5fa 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+
+        /* Button Styles */
+        .btn {
             display: inline-flex;
             align-items: center;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
             font-weight: 500;
-            border-radius: calc(var(--radius) * 0.75);
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, hsl(var(--primary)) 0%, #06b6d4 100%);
+            color: hsl(var(--primary-foreground));
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            border: 1px solid hsl(var(--secondary-border));
+        }
+
+        .btn-secondary:hover {
             background: hsl(var(--accent));
-            color: hsl(var(--accent-foreground));
         }
 
-        .badge.animate-pulse {
-            animation: pulse 2s infinite;
+        .btn-destructive {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Form Styles */
         .form-group {
             margin-bottom: 1rem;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
             font-weight: 500;
+            margin-bottom: 0.5rem;
             color: hsl(var(--foreground));
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.5rem 0.75rem;
             border: 1px solid hsl(var(--border));
             border-radius: var(--radius);
-            background: hsl(var(--background));
+            background-color: hsl(var(--background));
             color: hsl(var(--foreground));
-            font-size: 1rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: hsl(var(--ring));
-            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
         }
 
-        .textarea {
+        .form-textarea {
+            min-height: 80px;
             resize: vertical;
-            min-height: 4rem;
         }
 
-        .quick-amounts {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
-
-        .quick-amount-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid hsl(var(--border));
-            border-radius: var(--radius);
-            background: hsl(var(--background));
-            color: hsl(var(--foreground));
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .quick-amount-btn:hover {
-            background: hsl(var(--muted));
-        }
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .button-primary {
-            background: hsl(var(--primary));
-            color: hsl(var(--primary-foreground));
-        }
-
-        .button-primary:hover:not(:disabled) {
-            background: hsl(var(--primary) / 0.9);
-        }
-
-        .button-large {
-            padding: 1rem 2rem;
-            font-size: 1.125rem;
-        }
-
-        .button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
+        /* Daily Reward Styles */
         .daily-reward {
             text-align: center;
-        }
-
-        .reward-icon-container {
-            position: relative;
-            width: 8rem;
-            height: 8rem;
-            margin: 0 auto 1rem;
-        }
-
-        .reward-icon-bg {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
         }
 
-        .reward-icon-inner {
-            width: 6rem;
-            height: 6rem;
-            border-radius: 50%;
-            background: hsl(var(--card));
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .reward-glow {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: hsl(var(--accent) / 0.2);
-            filter: blur(1rem);
+        .daily-reward.available {
             animation: pulse 2s infinite;
         }
 
-        .reward-amount {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
 
-        .reward-number {
+        .reward-icon {
+            width: 3rem;
+            height: 3rem;
+            margin: 0 auto 1rem;
+            color: #fbbf24;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .countdown {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
-            font-weight: 700;
-            color: hsl(var(--accent));
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: hsl(var(--primary));
         }
 
-        .donations-list {
-            max-height: 20rem;
+        /* Donation List */
+        .donation-list {
+            max-height: 400px;
             overflow-y: auto;
+            padding-right: 0.5rem;
         }
 
         .donation-item {
             display: flex;
+            align-items: center;
             gap: 0.75rem;
             padding: 0.75rem;
             border-radius: var(--radius);
-            transition: background-color 0.2s;
+            background: hsl(var(--muted));
+            margin-bottom: 0.5rem;
+            border: 1px solid hsl(var(--border));
         }
 
-        .donation-item:hover {
-            background: hsl(var(--muted) / 0.5);
-        }
-
-        .donor-avatar {
+        .donation-avatar {
             width: 2.5rem;
             height: 2.5rem;
             border-radius: 50%;
-            background: hsl(var(--accent));
-            color: hsl(var(--accent-foreground));
+            background: linear-gradient(135deg, #60a5fa 0%, #06b6d4 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
+            color: white;
+            font-weight: 600;
             font-size: 0.875rem;
         }
 
@@ -413,592 +426,880 @@
         .donation-header {
             display: flex;
             justify-content: space-between;
-            align-items: start;
+            align-items: center;
             margin-bottom: 0.25rem;
         }
 
-        .donor-name {
-            font-weight: 500;
-            color: hsl(var(--foreground));
+        .donation-name {
+            font-weight: 600;
             font-size: 0.875rem;
-        }
-
-        .donation-time {
-            color: hsl(var(--muted-foreground));
-            font-size: 0.75rem;
         }
 
         .donation-amount {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 600;
+            color: #10b981;
             font-size: 0.875rem;
-            color: hsl(var(--foreground));
         }
 
         .donation-message {
-            color: hsl(var(--muted-foreground));
             font-size: 0.75rem;
-            margin-top: 0.25rem;
-            font-style: italic;
+            color: hsl(var(--muted-foreground));
+            line-height: 1.4;
         }
 
-        .empty-state {
-            text-align: center;
+        .donation-time {
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+            margin-top: 0.25rem;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 2rem;
+        }
+
+        .spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid hsl(var(--muted));
+            border-top: 2px solid hsl(var(--primary));
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Styles */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--card-border));
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid hsl(var(--destructive));
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-description {
+            font-size: 0.875rem;
             color: hsl(var(--muted-foreground));
         }
 
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--card-border));
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .toast-container {
+                left: 1rem;
+                right: 1rem;
+            }
+
+            .toast {
+                max-width: none;
+            }
+        }
+
+        /* Footer */
         .footer {
-            background: hsl(var(--card) / 0.5);
+            background: hsl(var(--card));
             border-top: 1px solid hsl(var(--card-border));
             margin-top: 4rem;
             padding: 2rem 0;
             text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-text {
             color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
         }
 
-        .hidden {
-            display: none;
+        .footer-subtext {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.75rem;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        /* Animation utilities */
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .animate-bounce {
+            animation: bounce 1s infinite;
         }
 
-        .spinner {
-            width: 3rem;
-            height: 3rem;
-            border: 3px solid hsl(var(--muted));
-            border-top: 3px solid hsl(var(--primary));
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+        /* Glassmorphism effect */
+        .glass {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .loading-screen {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
+        /* Gradient backgrounds */
+        .gradient-bg {
+            background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
         }
 
-        .icon {
-            width: 1.25rem;
-            height: 1.25rem;
-            fill: currentColor;
+        /* Special effects */
+        .glow {
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
         }
 
-        .icon-small {
-            width: 1rem;
-            height: 1rem;
+        .glow-intense {
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
         }
 
-        .icon-large {
-            width: 3rem;
-            height: 3rem;
+        /* Donation amount buttons */
+        .amount-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        @media (min-width: 768px) {
-            .header-content {
-                justify-content: space-between;
-            }
-            
-            .layout {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
+        .amount-btn {
+            padding: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+
+        .amount-btn:hover {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--primary));
+        }
+
+        .amount-btn.selected {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border-color: hsl(var(--primary));
+        }
+
+        /* Utility classes */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .p-4 { padding: 1rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .hidden { display: none; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .rounded { border-radius: var(--radius); }
+        .rounded-full { border-radius: 9999px; }
+        .border { border: 1px solid hsl(var(--border)); }
+        .bg-primary { background-color: hsl(var(--primary)); }
+        .bg-secondary { background-color: hsl(var(--secondary)); }
+        .text-primary { color: hsl(var(--primary)); }
+        .text-muted { color: hsl(var(--muted-foreground)); }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div class="loading-screen">
-            <div class="spinner"></div>
-            <p>Loading MaxDoesEdit Fundraiser...</p>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        <i data-lucide="sun" class="w-4 h-4"></i>
+    </button>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="menu-button" aria-label="Menu">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    <h1 class="header-title">MaxDoesEdit Fundraiser</h1>
+                </div>
+                <div class="coin-balance">
+                    <i data-lucide="coins" class="coin-icon"></i>
+                    <span class="balance-amount" id="coin-balance">0</span>
+                </div>
+            </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <!-- Fundraiser Card -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Virtual Coin Fundraiser</h2>
+                    <p class="card-description">Help MaxDoesEdit reach the goal with your virtual coin donations!</p>
+                </div>
+                <div id="daily-reward-indicator" class="hidden">
+                    <i data-lucide="gift" class="w-8 h-8 text-yellow-400 animate-bounce"></i>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span class="amount-display" id="current-amount">0</span>
+                    <span class="amount-display" id="goal-amount">1,000,000</span>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-raised">0</div>
+                    <div class="stat-label">Total Raised</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="total-donors">0</div>
+                    <div class="stat-label">Total Donors</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="progress-percent">0%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Reward Card -->
+        <div id="daily-reward-card" class="card daily-reward">
+            <div class="card-header">
+                <h3 class="card-title">Daily Reward</h3>
+            </div>
+            <div id="reward-available" class="hidden">
+                <i data-lucide="gift" class="reward-icon"></i>
+                <p class="text-lg font-semibold mb-4">Claim your daily 50,000 coins!</p>
+                <button id="claim-reward-btn" class="btn btn-primary">
+                    <i data-lucide="gift" class="w-4 h-4"></i>
+                    Claim Reward
+                </button>
+            </div>
+            <div id="reward-claimed" class="text-center">
+                <i data-lucide="check-circle" class="w-12 h-12 mx-auto mb-4 text-green-500"></i>
+                <p class="text-lg font-semibold mb-2">Daily reward claimed!</p>
+                <p class="text-muted">Come back in:</p>
+                <div id="countdown" class="countdown">24:00:00</div>
+            </div>
+        </div>
+
+        <!-- Donation Form Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Make a Donation</h3>
+                <p class="card-description">Support the fundraiser with your virtual coins!</p>
+            </div>
+
+            <form id="donation-form">
+                <div class="form-group">
+                    <label class="form-label" for="donor-name">Your Name</label>
+                    <input type="text" id="donor-name" class="form-input" placeholder="Enter your name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="donation-amount">Amount (coins)</label>
+                    <div class="amount-buttons">
+                        <button type="button" class="amount-btn" data-amount="1000">1K</button>
+                        <button type="button" class="amount-btn" data-amount="5000">5K</button>
+                        <button type="button" class="amount-btn" data-amount="10000">10K</button>
+                        <button type="button" class="amount-btn" data-amount="25000">25K</button>
+                        <button type="button" class="amount-btn" data-amount="50000">50K</button>
+                    </div>
+                    <input type="number" id="donation-amount" class="form-input" placeholder="Enter custom amount" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="donation-message">Message (optional)</label>
+                    <textarea id="donation-message" class="form-input form-textarea" placeholder="Leave a message..."></textarea>
+                </div>
+
+                <button type="submit" id="donate-btn" class="btn btn-primary w-full">
+                    <i data-lucide="heart" class="w-4 h-4"></i>
+                    Donate Now
+                </button>
+            </form>
+        </div>
+
+        <!-- Recent Donations Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Donations</h3>
+                <p class="card-description">See the latest contributions from our amazing supporters!</p>
+            </div>
+
+            <div id="donations-loading" class="loading">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="donations-list" class="donation-list hidden">
+                <!-- Donations will be populated here -->
+            </div>
+
+            <div id="no-donations" class="text-center py-8 hidden">
+                <i data-lucide="heart" class="w-12 h-12 mx-auto mb-4 text-muted"></i>
+                <p class="text-muted">No donations yet. Be the first to contribute!</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">MaxDoesEdit Virtual Coin Fundraiser • Made with ❤️ for the community</p>
+            <p class="footer-subtext">All donations are virtual coins - no real money involved</p>
+        </div>
+    </footer>
 
     <script>
-        // Mock data and state management
-        class FundraiserApp {
-            constructor() {
-                this.state = {
-                    user: {
-                        id: 'demo-user',
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxex6uMN7aUzvVkhS61vFRKuq3FIOjQzo",
+            authDomain: "maxdoesedit.firebaseapp.com",
+            databaseURL: "https://maxdoesedit-default-rtdb.firebaseio.com",
+            projectId: "maxdoesedit",
+            storageBucket: "maxdoesedit.firebasestorage.app",
+            messagingSenderId: "986227283849",
+            appId: "1:986227283849:web:50602a99575cb2855a3358"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Global state
+        let currentUser = null;
+        let fundraiserData = {
+            currentAmount: 0,
+            currentGoal: 1000000,
+            totalDonors: 0
+        };
+        let userBalance = 0;
+        let lastDailyReward = null;
+
+        // Initialize user
+        function initializeUser() {
+            const userId = 'maxdoesedit_user';
+            const userRef = database.ref(`users/${userId}`);
+            
+            userRef.once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    userBalance = userData.coinBalance || 0;
+                    lastDailyReward = userData.lastDailyReward || null;
+                    currentUser = { id: userId, ...userData };
+                } else {
+                    // Create new user
+                    const newUser = {
                         username: 'MaxDoesEdit_User',
-                        coinBalance: 100000
-                    },
-                    fundraiser: {
-                        currentAmount: 250000,
+                        coinBalance: 50000, // Starting balance
+                        lastDailyReward: null,
+                        createdAt: Date.now()
+                    };
+                    userRef.set(newUser);
+                    userBalance = newUser.coinBalance;
+                    currentUser = { id: userId, ...newUser };
+                }
+                
+                updateCoinBalance();
+                updateDailyRewardStatus();
+            });
+        }
+
+        // Initialize fundraiser data
+        function initializeFundraiser() {
+            const fundraiserRef = database.ref('fundraiser');
+            
+            fundraiserRef.once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    fundraiserData = snapshot.val();
+                } else {
+                    // Initialize fundraiser
+                    fundraiserData = {
+                        currentAmount: 0,
                         currentGoal: 1000000,
-                        totalDonors: 42
-                    },
-                    donations: [
-                        {
-                            id: '1',
-                            name: 'Anonymous Supporter',
-                            amount: 5000,
-                            message: 'Keep up the great work!',
-                            createdAt: new Date(Date.now() - 1000 * 60 * 5)
-                        },
-                        {
-                            id: '2',
-                            name: 'CoinMaster99',
-                            amount: 10000,
-                            message: 'Love your content!',
-                            createdAt: new Date(Date.now() - 1000 * 60 * 15)
-                        },
-                        {
-                            id: '3',
-                            name: 'GenerousViewer',
-                            amount: 25000,
-                            message: 'Hope this helps reach the goal!',
-                            createdAt: new Date(Date.now() - 1000 * 60 * 30)
-                        }
-                    ],
-                    dailyReward: {
-                        isAvailable: true,
-                        amount: 50000,
-                        nextRewardTime: null
-                    }
-                };
+                        totalDonors: 0,
+                        updatedAt: Date.now()
+                    };
+                    fundraiserRef.set(fundraiserData);
+                }
                 
-                this.init();
-            }
+                updateFundraiserDisplay();
+            });
 
-            init() {
-                setTimeout(() => {
-                    this.render();
-                }, 1000);
-            }
-
-            getInitials(name) {
-                return name.split(' ')
-                    .map(word => word.charAt(0))
-                    .join('')
-                    .toUpperCase()
-                    .slice(0, 2);
-            }
-
-            formatTimeAgo(date) {
-                const now = Date.now();
-                const diff = now - date.getTime();
-                const minutes = Math.floor(diff / (1000 * 60));
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-                if (minutes < 1) return 'just now';
-                if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
-                if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
-                return `${days} day${days === 1 ? '' : 's'} ago`;
-            }
-
-            handleDonate = (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const name = formData.get('donorName').trim();
-                const amount = parseInt(formData.get('donationAmount'));
-                const message = formData.get('donationMessage').trim();
-
-                if (!name || amount <= 0 || amount > this.state.user.coinBalance) {
-                    alert('Please check your donation details');
-                    return;
+            // Listen for real-time updates
+            fundraiserRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    fundraiserData = snapshot.val();
+                    updateFundraiserDisplay();
                 }
+            });
+        }
 
-                // Update state
-                this.state.user.coinBalance -= amount;
-                this.state.fundraiser.currentAmount += amount;
-                this.state.fundraiser.totalDonors += 1;
+        // Load recent donations
+        function loadRecentDonations() {
+            const donationsRef = database.ref('donations').orderByChild('createdAt').limitToLast(10);
+            
+            donationsRef.on('value', (snapshot) => {
+                const donations = [];
+                snapshot.forEach((child) => {
+                    donations.unshift(child.val());
+                });
                 
-                // Add new donation
-                const newDonation = {
-                    id: Date.now().toString(),
-                    name,
-                    amount,
-                    message,
-                    createdAt: new Date()
-                };
-                this.state.donations.unshift(newDonation);
+                displayDonations(donations);
+            });
+        }
 
-                // Reset form
-                e.target.reset();
+        // Update coin balance display
+        function updateCoinBalance() {
+            document.getElementById('coin-balance').textContent = formatNumber(userBalance);
+        }
 
-                // Show success message
-                this.showToast(`Donation successful! Donated ${amount.toLocaleString()} coins!`, 'success');
+        // Update fundraiser display
+        function updateFundraiserDisplay() {
+            const progressPercent = Math.min((fundraiserData.currentAmount / fundraiserData.currentGoal) * 100, 100);
+            
+            document.getElementById('current-amount').textContent = formatNumber(fundraiserData.currentAmount);
+            document.getElementById('goal-amount').textContent = formatNumber(fundraiserData.currentGoal);
+            document.getElementById('total-raised').textContent = formatNumber(fundraiserData.currentAmount);
+            document.getElementById('total-donors').textContent = formatNumber(fundraiserData.totalDonors);
+            document.getElementById('progress-percent').textContent = Math.round(progressPercent) + '%';
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+        }
 
-                // Re-render
-                this.render();
-            }
-
-            handleClaimDailyReward = () => {
-                if (!this.state.dailyReward.isAvailable) return;
-
-                this.state.user.coinBalance += this.state.dailyReward.amount;
-                this.state.dailyReward.isAvailable = false;
-                this.state.dailyReward.nextRewardTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-                this.showToast(`Daily reward claimed! You received ${this.state.dailyReward.amount.toLocaleString()} coins!`, 'success');
-                this.render();
-            }
-
-            selectQuickAmount = (amount) => {
-                const input = document.getElementById('donationAmount');
-                if (input) {
-                    input.value = amount;
-                }
-            }
-
-            showToast(message, type = 'info') {
-                // Simple toast implementation
-                const toast = document.createElement('div');
-                toast.style.cssText = `
-                    position: fixed;
-                    top: 1rem;
-                    right: 1rem;
-                    background: hsl(var(--card));
-                    border: 1px solid hsl(var(--border));
-                    border-radius: var(--radius);
-                    padding: 1rem;
-                    color: hsl(var(--foreground));
-                    z-index: 1000;
-                    animation: slideIn 0.3s ease;
-                `;
-                toast.textContent = message;
-                document.body.appendChild(toast);
-
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
-            }
-
-            render() {
-                const { user, fundraiser, donations, dailyReward } = this.state;
-                const progress = Math.min((fundraiser.currentAmount / fundraiser.currentGoal) * 100, 100);
-                const isGoalReached = fundraiser.currentAmount >= fundraiser.currentGoal;
-
-                document.getElementById('app').innerHTML = `
-                    <header class="header">
-                        <div class="container">
-                            <div class="header-content">
-                                <div class="profile-section">
-                                    <div class="profile-avatar">ME</div>
-                                    <div class="profile-info">
-                                        <h1>MaxDoesEdit</h1>
-                                        <p>Virtual Coin Fundraiser</p>
-                                    </div>
-                                </div>
-                                <div class="balance-display">
-                                    <svg class="coin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="8"/>
-                                        <path d="M9.5 9.5a3.5 3.5 0 0 1 5 0"/>
-                                        <path d="M14.5 14.5a3.5 3.5 0 0 1-5 0"/>
-                                    </svg>
-                                    <span class="balance-amount">${user.coinBalance.toLocaleString()}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-
-                    <main class="main">
-                        <div class="container">
-                            <div class="layout">
-                                <!-- Fundraiser Card -->
-                                <div class="card">
-                                    <div class="card-content">
-                                        <div class="card-header">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <path d="m8 12 2 2 4-4"/>
-                                            </svg>
-                                            <h2 class="card-title">Current Goal</h2>
-                                            ${isGoalReached ? '<span class="badge animate-pulse">Goal Reached! 🎉</span>' : ''}
-                                        </div>
-                                        <p class="card-description">Help MaxDoesEdit reach the virtual coin target and unlock rewards!</p>
-                                        
-                                        <div class="fundraiser-stats">
-                                            <div>
-                                                <p class="stat-label">Raised</p>
-                                                <p class="stat-value">${fundraiser.currentAmount.toLocaleString()}</p>
-                                            </div>
-                                            <div style="color: hsl(var(--muted-foreground));">
-                                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="stat-label">Goal</p>
-                                                <p class="stat-value">${fundraiser.currentGoal.toLocaleString()}</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="progress-container">
-                                            <div class="progress-info">
-                                                <span>${progress.toFixed(1)}% of goal</span>
-                                                <span style="display: flex; align-items: center; gap: 0.25rem;">
-                                                    <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                                        <circle cx="9" cy="7" r="4"/>
-                                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                                    </svg>
-                                                    ${fundraiser.totalDonors} donors
-                                                </span>
-                                            </div>
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: ${progress}%"></div>
-                                            </div>
-                                        </div>
-
-                                        ${isGoalReached ? `
-                                            <div style="padding: 1rem; border-radius: var(--radius); background: hsl(var(--primary) / 0.1); border: 1px solid hsl(var(--primary) / 0.2); color: hsl(var(--primary));">
-                                                🎉 Congratulations! Goal reached! The next goal is now ${(fundraiser.currentGoal * 2).toLocaleString()} coins.
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
-
-                                <!-- Daily Reward -->
-                                ${dailyReward.isAvailable ? `
-                                    <div class="card">
-                                        <div class="card-content">
-                                            <div class="card-header">
-                                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <rect x="3" y="8" width="18" height="4" rx="1"/>
-                                                    <path d="M12 8v13"/>
-                                                    <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/>
-                                                    <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>
-                                                </svg>
-                                                <h2 class="card-title" style="color: hsl(var(--accent));">Daily Reward</h2>
-                                                <span class="badge animate-pulse">Available Now!</span>
-                                            </div>
-                                            
-                                            <div class="daily-reward">
-                                                <div class="reward-icon-container">
-                                                    <div class="reward-glow"></div>
-                                                    <div class="reward-icon-bg">
-                                                        <div class="reward-icon-inner">
-                                                            <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <circle cx="12" cy="12" r="8"/>
-                                                                <path d="M9.5 9.5a3.5 3.5 0 0 1 5 0"/>
-                                                                <path d="M14.5 14.5a3.5 3.5 0 0 1-5 0"/>
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Daily Bonus</h3>
-                                                <div class="reward-amount">
-                                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <circle cx="12" cy="12" r="8"/>
-                                                        <path d="M9.5 9.5a3.5 3.5 0 0 1 5 0"/>
-                                                        <path d="M14.5 14.5a3.5 3.5 0 0 1-5 0"/>
-                                                    </svg>
-                                                    <span class="reward-number">${dailyReward.amount.toLocaleString()}</span>
-                                                    <span style="color: hsl(var(--muted-foreground));">coins</span>
-                                                </div>
-                                                <p style="color: hsl(var(--muted-foreground)); margin-bottom: 1.5rem;">Free coins every 24 hours!</p>
-
-                                                <button class="button button-primary button-large" onclick="app.handleClaimDailyReward()" style="width: 100%;">
-                                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <rect x="3" y="8" width="18" height="4" rx="1"/>
-                                                        <path d="M12 8v13"/>
-                                                        <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/>
-                                                        <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>
-                                                    </svg>
-                                                    Claim Daily Reward
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ` : `
-                                    <div class="card" style="opacity: 0.6;">
-                                        <div class="card-content">
-                                            <div class="card-header">
-                                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <circle cx="12" cy="12" r="10"/>
-                                                    <polyline points="12,6 12,12 16,14"/>
-                                                </svg>
-                                                <h2 class="card-title" style="color: hsl(var(--muted-foreground));">Daily Reward</h2>
-                                            </div>
-                                            <div class="daily-reward" style="padding: 2rem 0;">
-                                                <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; opacity: 0.5; color: hsl(var(--muted-foreground));">
-                                                    <rect x="3" y="8" width="18" height="4" rx="1"/>
-                                                    <path d="M12 8v13"/>
-                                                    <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/>
-                                                    <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>
-                                                </svg>
-                                                <p style="color: hsl(var(--muted-foreground)); font-weight: 500;">Daily reward claimed!</p>
-                                                <p style="color: hsl(var(--muted-foreground)); font-size: 0.875rem;">Come back in 24 hours for your next 50k coins</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `}
-
-                                <!-- Donation Form -->
-                                <div class="card">
-                                    <div class="card-content">
-                                        <div class="card-header">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                            </svg>
-                                            <h2 class="card-title">Make a Donation</h2>
-                                        </div>
-
-                                        <form onsubmit="app.handleDonate(event)">
-                                            <div class="form-group">
-                                                <label class="form-label" for="donorName">Your Name</label>
-                                                <input class="form-input" type="text" id="donorName" name="donorName" placeholder="Enter your name" required>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="form-label" for="donationAmount">Donation Amount</label>
-                                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                                                    <div style="position: relative; flex: 1;">
-                                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: hsl(var(--muted-foreground));">
-                                                            <circle cx="12" cy="12" r="8"/>
-                                                            <path d="M9.5 9.5a3.5 3.5 0 0 1 5 0"/>
-                                                            <path d="M14.5 14.5a3.5 3.5 0 0 1-5 0"/>
-                                                        </svg>
-                                                        <input class="form-input" type="number" id="donationAmount" name="donationAmount" placeholder="0" min="1" max="${user.coinBalance}" style="padding-left: 2.5rem;" required>
-                                                    </div>
-                                                    <span class="badge" style="background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground));">
-                                                        Balance: ${user.coinBalance.toLocaleString()}
-                                                    </span>
-                                                </div>
-                                                
-                                                <div class="quick-amounts">
-                                                    ${[100, 500, 1000, 5000, 10000]
-                                                        .filter(amount => amount <= user.coinBalance)
-                                                        .map(amount => `
-                                                            <button type="button" class="quick-amount-btn" onclick="app.selectQuickAmount(${amount})">
-                                                                ${amount.toLocaleString()}
-                                                            </button>
-                                                        `).join('')}
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="form-label" for="donationMessage">Message (Optional)</label>
-                                                <textarea class="form-input textarea" id="donationMessage" name="donationMessage" placeholder="Leave a message for MaxDoesEdit..." maxlength="200"></textarea>
-                                                <p style="color: hsl(var(--muted-foreground)); font-size: 0.75rem; margin-top: 0.25rem;">
-                                                    <span id="messageLength">0</span>/200 characters
-                                                </p>
-                                            </div>
-
-                                            <button type="submit" class="button button-primary button-large" style="width: 100%;">
-                                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <line x1="22" y1="2" x2="11" y2="13"/>
-                                                    <polygon points="22,2 15,22 11,13 2,9 22,2"/>
-                                                </svg>
-                                                Donate Now
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-
-                                <!-- Recent Donations -->
-                                <div class="card">
-                                    <div class="card-content">
-                                        <div class="card-header">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <polyline points="12,6 12,12 16,14"/>
-                                            </svg>
-                                            <h2 class="card-title">Recent Donations</h2>
-                                            <span class="badge" style="background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground));">
-                                                ${donations.length} donations
-                                            </span>
-                                        </div>
-
-                                        ${donations.length === 0 ? `
-                                            <div class="empty-state">
-                                                <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 0.75rem; opacity: 0.5;">
-                                                    <circle cx="12" cy="12" r="8"/>
-                                                    <path d="M9.5 9.5a3.5 3.5 0 0 1 5 0"/>
-                                                    <path d="M14.5 14.5a3.5 3.5 0 0 1-5 0"/>
-                                                </svg>
-                                                <p>No donations yet. Be the first to support!</p>
-                                            </div>
-                                        ` : `
-                                            <div class="donations-list">
-                                                ${donations.map(donation => `
-                                                    <div class="donation-item">
-                                                        <div class="donor-avatar">${this.getInitials(donation.name)}</div>
-                                                        <div class="donation-content">
-                                                            <div class="donation-header">
-                                                                <div>
-                                                                    <div class="donor-name">${donation.name}</div>
-                                                                    <div class="donation-time">${this.formatTimeAgo(donation.createdAt)}</div>
-                                                                </div>
-                                                                <div style="display: flex; align-items: center; gap: 0.25rem;">
-                                                                    <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                        <circle cx="12" cy="12" r="8"/>
-                                                                        <path d="M9.5 9.5a3.5 3.5 0 0 1 5 0"/>
-                                                                        <path d="M14.5 14.5a3.5 3.5 0 0 1-5 0"/>
-                                                                    </svg>
-                                                                    <span class="donation-amount">${donation.amount.toLocaleString()}</span>
-                                                                </div>
-                                                            </div>
-                                                            ${donation.message ? `
-                                                                <div class="donation-message">"${donation.message}"</div>
-                                                            ` : ''}
-                                                        </div>
-                                                    </div>
-                                                `).join('')}
-                                            </div>
-                                        `}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </main>
-
-                    <footer class="footer">
-                        <div class="container">
-                            <p>MaxDoesEdit Virtual Coin Fundraiser • Made with ❤️ for the community</p>
-                            <p style="font-size: 0.75rem; margin-top: 0.25rem;">All donations are virtual coins - no real money involved</p>
-                        </div>
-                    </footer>
-                `;
-
-                // Add message counter functionality
-                const messageInput = document.getElementById('donationMessage');
-                const messageLength = document.getElementById('messageLength');
-                if (messageInput && messageLength) {
-                    messageInput.addEventListener('input', (e) => {
-                        messageLength.textContent = e.target.value.length;
-                    });
-                }
+        // Update daily reward status
+        function updateDailyRewardStatus() {
+            const now = Date.now();
+            const dayInMs = 24 * 60 * 60 * 1000;
+            const timeSinceLastReward = lastDailyReward ? now - lastDailyReward : dayInMs;
+            
+            const rewardAvailable = timeSinceLastReward >= dayInMs;
+            
+            document.getElementById('reward-available').classList.toggle('hidden', !rewardAvailable);
+            document.getElementById('reward-claimed').classList.toggle('hidden', rewardAvailable);
+            document.getElementById('daily-reward-indicator').classList.toggle('hidden', !rewardAvailable);
+            
+            if (rewardAvailable) {
+                document.getElementById('daily-reward-card').classList.add('available');
+            } else {
+                document.getElementById('daily-reward-card').classList.remove('available');
+                startCountdown(lastDailyReward + dayInMs);
             }
         }
 
-        // Initialize the app
-        const app = new FundraiserApp();
+        // Start countdown timer
+        function startCountdown(targetTime) {
+            function updateCountdown() {
+                const now = Date.now();
+                const timeLeft = targetTime - now;
+                
+                if (timeLeft <= 0) {
+                    updateDailyRewardStatus();
+                    return;
+                }
+                
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdown').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
 
-        // Add some CSS animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
+        // Display donations
+        function displayDonations(donations) {
+            const loadingEl = document.getElementById('donations-loading');
+            const listEl = document.getElementById('donations-list');
+            const noDataEl = document.getElementById('no-donations');
+            
+            loadingEl.classList.add('hidden');
+            
+            if (donations.length === 0) {
+                listEl.classList.add('hidden');
+                noDataEl.classList.remove('hidden');
+                return;
+            }
+            
+            noDataEl.classList.add('hidden');
+            listEl.classList.remove('hidden');
+            
+            listEl.innerHTML = donations.map(donation => `
+                <div class="donation-item">
+                    <div class="donation-avatar">
+                        ${donation.donorName.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="donation-content">
+                        <div class="donation-header">
+                            <span class="donation-name">${escapeHtml(donation.donorName)}</span>
+                            <span class="donation-amount">+${formatNumber(donation.amount)}</span>
+                        </div>
+                        ${donation.message ? `<div class="donation-message">${escapeHtml(donation.message)}</div>` : ''}
+                        <div class="donation-time">${formatTime(donation.createdAt)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Handle donation form submission
+        async function handleDonation(event) {
+            event.preventDefault();
+            
+            const donorName = document.getElementById('donor-name').value.trim();
+            const amount = parseInt(document.getElementById('donation-amount').value);
+            const message = document.getElementById('donation-message').value.trim();
+            
+            if (!donorName || !amount || amount <= 0) {
+                showToast('Please fill in all required fields with valid values.', 'error');
+                return;
+            }
+            
+            if (amount > userBalance) {
+                showToast('Insufficient coin balance for this donation.', 'error');
+                return;
+            }
+            
+            const donateBtn = document.getElementById('donate-btn');
+            donateBtn.disabled = true;
+            donateBtn.innerHTML = '<div class="spinner" style="width: 1rem; height: 1rem;"></div> Processing...';
+            
+            try {
+                // Create donation object
+                const donation = {
+                    donorName,
+                    amount,
+                    message: message || null,
+                    createdAt: Date.now(),
+                    userId: currentUser.id
+                };
+                
+                // Add donation to database
+                const donationRef = database.ref('donations').push();
+                await donationRef.set(donation);
+                
+                // Update user balance
+                userBalance -= amount;
+                await database.ref(`users/${currentUser.id}/coinBalance`).set(userBalance);
+                
+                // Update fundraiser
+                fundraiserData.currentAmount += amount;
+                if (!fundraiserData.donors) fundraiserData.donors = {};
+                if (!fundraiserData.donors[currentUser.id]) {
+                    fundraiserData.totalDonors += 1;
+                    fundraiserData.donors[currentUser.id] = true;
                 }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
+                fundraiserData.updatedAt = Date.now();
+                
+                await database.ref('fundraiser').set(fundraiserData);
+                
+                // Update UI
+                updateCoinBalance();
+                updateFundraiserDisplay();
+                
+                // Reset form
+                document.getElementById('donation-form').reset();
+                clearAmountSelection();
+                
+                showToast(`Donation successful! Thank you for contributing ${formatNumber(amount)} coins!`, 'success');
+                
+            } catch (error) {
+                console.error('Donation error:', error);
+                showToast('Failed to process donation. Please try again.', 'error');
+            } finally {
+                donateBtn.disabled = false;
+                donateBtn.innerHTML = '<i data-lucide="heart" class="w-4 h-4"></i> Donate Now';
+                lucide.createIcons();
+            }
+        }
+
+        // Handle daily reward claim
+        async function claimDailyReward() {
+            const claimBtn = document.getElementById('claim-reward-btn');
+            claimBtn.disabled = true;
+            claimBtn.innerHTML = '<div class="spinner" style="width: 1rem; height: 1rem;"></div> Claiming...';
+            
+            try {
+                const rewardAmount = 50000;
+                const now = Date.now();
+                
+                // Update user balance and last reward time
+                userBalance += rewardAmount;
+                lastDailyReward = now;
+                
+                await database.ref(`users/${currentUser.id}`).update({
+                    coinBalance: userBalance,
+                    lastDailyReward: now
+                });
+                
+                // Update UI
+                updateCoinBalance();
+                updateDailyRewardStatus();
+                
+                showToast(`Daily reward claimed! You received ${formatNumber(rewardAmount)} coins!`, 'success');
+                
+            } catch (error) {
+                console.error('Claim reward error:', error);
+                showToast('Failed to claim reward. Please try again.', 'error');
+            } finally {
+                claimBtn.disabled = false;
+                claimBtn.innerHTML = '<i data-lucide="gift" class="w-4 h-4"></i> Claim Reward';
+                lucide.createIcons();
+            }
+        }
+
+        // Handle amount button clicks
+        function handleAmountButton(event) {
+            if (event.target.classList.contains('amount-btn')) {
+                clearAmountSelection();
+                event.target.classList.add('selected');
+                document.getElementById('donation-amount').value = event.target.dataset.amount;
+            }
+        }
+
+        // Clear amount button selection
+        function clearAmountSelection() {
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const title = type === 'success' ? 'Success!' : 'Error!';
+            toast.innerHTML = `
+                <div class="toast-title">${title}</div>
+                <div class="toast-description">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Utility functions
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+
+        function formatTime(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const icon = document.querySelector('#theme-toggle i');
+            const isLight = document.body.classList.contains('light-theme');
+            icon.setAttribute('data-lucide', isLight ? 'moon' : 'sun');
+            lucide.createIcons();
+            
+            // Save theme preference
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                const icon = document.querySelector('#theme-toggle i');
+                icon.setAttribute('data-lucide', 'moon');
+                lucide.createIcons();
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load theme
+            loadTheme();
+            
+            // Initialize app
+            initializeUser();
+            initializeFundraiser();
+            loadRecentDonations();
+            
+            // Form submission
+            document.getElementById('donation-form').addEventListener('submit', handleDonation);
+            
+            // Amount buttons
+            document.querySelector('.amount-buttons').addEventListener('click', handleAmountButton);
+            
+            // Custom amount input
+            document.getElementById('donation-amount').addEventListener('input', clearAmountSelection);
+            
+            // Daily reward claim
+            document.getElementById('claim-reward-btn').addEventListener('click', claimDailyReward);
+            
+            // Theme toggle
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            
+            // Refresh icons
+            lucide.createIcons();
+        });
+
+        // Light theme styles
+        const lightThemeStyles = `
+            .light-theme {
+                --background: 0 0% 100%;
+                --foreground: 222.2 84% 4.9%;
+                --card: 0 0% 100%;
+                --card-foreground: 222.2 84% 4.9%;
+                --card-border: 214.3 31.8% 91.4%;
+                --popover: 0 0% 100%;
+                --popover-foreground: 222.2 84% 4.9%;
+                --popover-border: 214.3 31.8% 91.4%;
+                --primary: 217.2 91.2% 59.8%;
+                --primary-foreground: 210 40% 98%;
+                --primary-border: 217.2 91.2% 59.8%;
+                --secondary: 210 40% 96%;
+                --secondary-foreground: 222.2 84% 4.9%;
+                --secondary-border: 214.3 31.8% 91.4%;
+                --muted: 210 40% 96%;
+                --muted-foreground: 215.4 16.3% 46.9%;
+                --accent: 210 40% 96%;
+                --accent-foreground: 222.2 84% 4.9%;
+                --destructive: 0 84.2% 60.2%;
+                --destructive-foreground: 210 40% 98%;
+                --border: 214.3 31.8% 91.4%;
+                --input: 214.3 31.8% 91.4%;
+                --ring: 224.3 76.3% 48%;
             }
         `;
-        document.head.appendChild(style);
+        
+        // Add light theme styles to head
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = lightThemeStyles;
+        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html>
